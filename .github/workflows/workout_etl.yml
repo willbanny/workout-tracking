@@ -29,7 +29,9 @@ jobs:
 
     - name: Create credentials file
       run: |
-        echo '${{ secrets.GOOGLE_CREDENTIALS }}' > workout-tracker-credentials.json
+        cat > workout-tracker-credentials.json << 'EOF'
+        ${{ secrets.GOOGLE_CREDENTIALS }}
+        EOF
 
     - name: Create .env file
       run: |
