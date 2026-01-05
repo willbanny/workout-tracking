@@ -82,6 +82,12 @@ def transform_data(session_info, exercises, workout_input):
     print(f"  ✓ Workout Date: {workout_date}")
     print(f"  ✓ Location: {location}")
 
+    # Check if there's any workout data to process
+    if len(workout_input) == 0 or workout_input.empty:
+        print("  ⚠️  No workout data found in Workout_Input sheet")
+        print("  ℹ️  Skipping ETL - nothing to process")
+        return None, session_dict
+
     # Add workout_date to all workout_input rows
     workout_input['workout_date'] = workout_date
     workout_input['location'] = location
@@ -284,6 +290,13 @@ def main():
 
         # TRANSFORM
         transformed_data, session_dict = transform_data(session_info, exercises, workout_input)
+
+        # Check if there's data to process
+        if transformed_data is None:
+            print("\n" + "=" * 60)
+            print("✅ ETL pipeline completed - No workout data to process")
+            print("=" * 60)
+            return
 
         # LOAD
         load_to_database(transformed_data, exercises)
