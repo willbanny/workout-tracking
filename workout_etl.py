@@ -30,7 +30,16 @@ def get_google_sheets_client():
     creds_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
     if creds_json:
         import json
-        creds_dict = json.loads(creds_json)
+        import base64
+
+        # Decode from base64 (handles all escaping issues)
+        try:
+            decoded = base64.b64decode(creds_json).decode('utf-8')
+            creds_dict = json.loads(decoded)
+        except Exception:
+            # Fall back to direct JSON if not base64
+            creds_dict = json.loads(creds_json)
+
         creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     else:
         # Fall back to file for local development
