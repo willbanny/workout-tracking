@@ -18,7 +18,7 @@ load_dotenv()
 
 SHEET_ID = os.getenv('SHEET_ID')
 CREDENTIALS_FILE = os.getenv('GOOGLE_CREDENTIALS_FILE')
-DB_PATH = 'workouts.db'
+DB_PATH = 'data/workouts.db'
 
 # Google Sheets scopes
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']

@@ -4,7 +4,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.datavalidation import DataValidation
 
 # Read the existing exercise list
-existing_exercises = pd.read_excel('Workout_Inputs.xlsx', sheet_name='Exercise_List')
+existing_exercises = pd.read_excel('../data/Workout_Inputs.xlsx', sheet_name='Exercise_List')
 
 # Create the new Exercises reference sheet with simplified structure
 exercises_df = pd.DataFrame({
@@ -33,7 +33,7 @@ workout_input_df = pd.DataFrame({
 })
 
 # Create Excel file with multiple sheets
-with pd.ExcelWriter('Workout_Tracker.xlsx', engine='openpyxl') as writer:
+with pd.ExcelWriter('../data/Workout_Tracker.xlsx', engine='openpyxl') as writer:
     # Write Session_Info sheet (workout-level data)
     session_info_df.to_excel(writer, sheet_name='Session_Info', index=False)
 
@@ -44,7 +44,7 @@ with pd.ExcelWriter('Workout_Tracker.xlsx', engine='openpyxl') as writer:
     workout_input_df.to_excel(writer, sheet_name='Workout_Input', index=False)
 
 # Now add data validation for the exercise_name column
-wb = load_workbook('Workout_Tracker.xlsx')
+wb = load_workbook('../data/Workout_Tracker.xlsx')
 ws_input = wb['Workout_Input']
 
 # Create a data validation that references the exercise_name column in Exercises sheet
@@ -65,7 +65,7 @@ dv.promptTitle = 'Exercise Selection'
 ws_input.add_data_validation(dv)
 dv.add(f'A2:A1000')
 
-wb.save('Workout_Tracker.xlsx')
+wb.save('../data/Workout_Tracker.xlsx')
 
 print("✓ Created Workout_Tracker.xlsx with 3 sheets:")
 print(f"  - Session_Info: One-time inputs per workout (date, location, length)")

@@ -46,8 +46,10 @@ GitHub Secrets store sensitive credentials securely. The workflow will access th
 4. Name: `SHEET_ID`
 5. Value: Your Google Sheet ID (from the .env file)
    ```
-   1uOjj2855nHjv7jbTpec5gwuTFNtgPR6ngGW80J6n6js
+   YOUR_GOOGLE_SHEET_ID_HERE
    ```
+   Example: If your sheet URL is `https://docs.google.com/spreadsheets/d/1abc123xyz/edit`,
+   the Sheet ID is `1abc123xyz`
 6. Click **Add secret**
 
 ### 4b. Add GOOGLE_CREDENTIALS Secret
@@ -55,7 +57,7 @@ GitHub Secrets store sensitive credentials securely. The workflow will access th
 1. Click **New repository secret** again
 2. Name: `GOOGLE_CREDENTIALS`
 3. Value: **Full contents** of your service account JSON file
-   - Open `workout-tracker-483421-70f71dc1ae7b.json`
+   - Open your service account JSON file (e.g., `workout-tracker-xxxxx-xxxxxxxx.json`)
    - Copy ALL the text (including { and })
    - Paste it into the secret value field
 4. Click **Add secret**

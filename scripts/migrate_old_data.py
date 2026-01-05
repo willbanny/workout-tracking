@@ -56,7 +56,7 @@ def transform_wide_to_narrow(workout_data, workout_date, location):
 
 def load_exercises_from_db():
     """Load exercise reference table from database"""
-    conn = sqlite3.connect('workouts.db')
+    conn = sqlite3.connect('../data/workouts.db')
     exercises = pd.read_sql('SELECT exercise_id, exercise_name FROM exercises', conn)
     conn.close()
     return exercises
@@ -92,7 +92,7 @@ def enrich_with_exercise_data(workout_data, exercises_df):
 def load_to_database(workout_data):
     """Load migrated data to database"""
 
-    conn = sqlite3.connect('workouts.db')
+    conn = sqlite3.connect('../data/workouts.db')
 
     # Prepare columns for database
     raw_cols = ['workout_date', 'location', 'exercise_id', 'exercise_name',
@@ -136,7 +136,7 @@ def main():
 
     # Read old Excel file
     print("\n📥 Reading Workout_Inputs.xlsx...")
-    xl = pd.ExcelFile('Workout_Inputs.xlsx')
+    xl = pd.ExcelFile('../data/Workout_Inputs.xlsx')
 
     inputs_sheet = pd.read_excel(xl, 'Inputs')
     workout_data = pd.read_excel(xl, 'Workout_Inputs')

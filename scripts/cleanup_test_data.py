@@ -12,7 +12,7 @@ def main():
     print("🧹 CLEANING UP TEST DATA")
     print("=" * 60)
 
-    conn = sqlite3.connect('workouts.db')
+    conn = sqlite3.connect('../data/workouts.db')
 
     # Show what we're about to delete
     print("\n📋 Test data to be deleted (from first ETL test run):")

@@ -100,13 +100,28 @@ python3 workout_etl.py
    python3 workout_etl.py
    ```
 
-## Files
+## Project Structure
 
-- `workout_etl.py` - Main ETL pipeline
-- `workout_automation_summary.md` - Original project plan
-- `workouts.db` - SQLite database (tracked in git)
-- `requirements.txt` - Python dependencies
-- `.github/workflows/workout_etl.yml` - GitHub Actions config
+```
+workout_logging/
+├── workout_etl.py              # Main ETL pipeline
+├── requirements.txt            # Python dependencies
+├── README.md                   # This file
+├── .github/
+│   └── workflows/
+│       └── workout_etl.yml     # GitHub Actions automation
+├── docs/
+│   ├── GITHUB_SETUP.md         # Setup instructions
+│   └── workout_automation_summary.md  # Project plan
+├── scripts/
+│   ├── create_workout_sheets.py  # Generate Excel templates
+│   ├── migrate_old_data.py       # Migrate historical data
+│   └── cleanup_test_data.py      # Cleanup utilities
+└── data/
+    ├── workouts.db               # SQLite database (tracked)
+    ├── Workout_Tracker.xlsx      # Current template
+    └── Workout_Inputs.xlsx       # Original data
+```
 
 ## Automation Schedule
 

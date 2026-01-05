@@ -12,9 +12,9 @@ venv/
 env/
 ENV/
 
-# Database files - but allow workouts.db to be committed
+# Database files - but allow data/workouts.db to be committed
 *.db
-!workouts.db
+!data/workouts.db
 *.sqlite
 *.sqlite3
 
