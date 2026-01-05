@@ -27,18 +27,10 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Create credentials file
-      run: |
-        cat > workout-tracker-credentials.json << 'EOF'
-        ${{ secrets.GOOGLE_CREDENTIALS }}
-        EOF
-
-    - name: Create .env file
-      run: |
-        echo "SHEET_ID=${{ secrets.SHEET_ID }}" > .env
-        echo "GOOGLE_CREDENTIALS_FILE=workout-tracker-credentials.json" >> .env
-
     - name: Run ETL pipeline
+      env:
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
         python3 workout_etl.py
 
@@ -53,8 +45,3 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Clean up credentials
-      if: always()
-      run: |
-        rm -f workout-tracker-credentials.json

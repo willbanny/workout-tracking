@@ -26,7 +26,16 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 def get_google_sheets_client():
     """Initialize and return Google Sheets client"""
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
+    # Try to load from environment variable first (for GitHub Actions)
+    creds_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
+    if creds_json:
+        import json
+        creds_dict = json.loads(creds_json)
+        creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+    else:
+        # Fall back to file for local development
+        creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
+
     client = gspread.authorize(creds)
     return client
 
