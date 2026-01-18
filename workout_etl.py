@@ -3,6 +3,7 @@ Workout Data ETL Pipeline
 Extracts data from Google Sheets, transforms it, and loads into SQLite database
 """
 
+import json
 import os
 import sqlite3
 from datetime import datetime
@@ -113,6 +114,11 @@ def transform_data(session_info, exercises, workout_input):
     # Filter out rows with no exercise_name (empty rows)
     workout_input = workout_input[workout_input['exercise_name'].notna() & (workout_input['exercise_name'] != '')]
 
+    # Auto-calculate set_number based on exercise occurrence order
+    # Each exercise gets sequential set numbers (1, 2, 3...) based on row order
+    workout_input = workout_input.copy()
+    workout_input['set_number'] = workout_input.groupby('exercise_name').cumcount() + 1
+
     print(f"  ✓ Processed {len(workout_input)} valid sets")
     print(f"  ✓ Calculated volume for strength exercises")
 
@@ -175,24 +181,39 @@ def initialize_database():
         )
     ''')
 
+    # Create workout sessions table (stores session-level metadata dynamically)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS workout_sessions (
+            workout_date TEXT PRIMARY KEY,
+            session_data TEXT,
+            created_at TEXT
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
     print("  ✓ Database schema created/verified")
 
 
-def load_to_database(workout_data, exercises_df):
+def load_to_database(workout_data, exercises_df, session_dict):
     """Load data into SQLite database"""
     print("\n📤 Loading data to database...")
 
     conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
 
     # Upsert exercises (insert or ignore if already exists)
     exercises_df.to_sql('exercises', conn, if_exists='replace', index=False)
     print(f"  ✓ Loaded {len(exercises_df)} exercises to reference table")
 
-    # Rename 'set' column to 'set_number' for database compatibility
-    workout_data = workout_data.rename(columns={'set': 'set_number'})
+    # Save session metadata (upsert - replace if date exists)
+    workout_date = session_dict.get('workout_date')
+    cursor.execute('''
+        INSERT OR REPLACE INTO workout_sessions (workout_date, session_data, created_at)
+        VALUES (?, ?, ?)
+    ''', (workout_date, json.dumps(session_dict), datetime.now().isoformat()))
+    print(f"  ✓ Saved session metadata ({len(session_dict)} fields)")
 
     # Append to raw table (always insert)
     raw_cols = ['workout_date', 'location', 'exercise_id', 'exercise_name', 'muscle_group',
@@ -239,9 +260,17 @@ def clear_input_sheets():
     # Reset Session_Info values (but keep structure)
     session_sheet = spreadsheet.worksheet('Session_Info')
 
-    # Update the 'value' column to be empty, preparing for next workout
-    session_sheet.update(values=[[''], [''], [''], ['']], range_name='B2:B5')
-    print("  ✓ Reset Session_Info values for next workout")
+    # Dynamically clear all value cells based on actual row count
+    all_session_values = session_sheet.get_all_values()
+    num_rows = len(all_session_values) - 1  # Exclude header row
+
+    if num_rows > 0:
+        # Create empty values list matching the number of data rows
+        empty_values = [[''] for _ in range(num_rows)]
+        session_sheet.update(values=empty_values, range_name=f'B2:B{num_rows + 1}')
+        print(f"  ✓ Reset {num_rows} Session_Info values for next workout")
+    else:
+        print("  ✓ Session_Info already empty")
 
 
 def generate_summary_report():
@@ -299,7 +328,7 @@ def main():
             return
 
         # LOAD
-        load_to_database(transformed_data, exercises)
+        load_to_database(transformed_data, exercises, session_dict)
 
         # CLEAR INPUT SHEETS (prepare for next workout)
         clear_input_sheets()
